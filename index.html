@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="productapp">
+<head>
+  <meta charset="utf-8">
+  <title>Sungard Assignment - Product Catalog</title>
+  
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular-sanitize.js"></script>
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.css">
+
+  <!-- ui-select files -->
+  <script src="lib/select.js"></script>
+  <link rel="stylesheet" href="css/select.css">
+  <link rel="stylesheet" href="css/productCatalog.css">
+  
+  <script src="js/demo.js"></script>
+  <script src="js/dbHandler.js"></script>
+  
+  <!-- Select Plugin css -->
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.css">
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.8.5/css/selectize.default.css">
+ 
+  <style>
+
+  </style>
+</head>
+
+<body ng-controller="DemoCtrl">
+	<!--Dropdown-->
+	<h3 style="margin-left:-48px;">Select from Product Catalog</h3>
+	<ui-select ng-model="product.selected" theme="select2" ng-disabled="disabled" style="min-width: 300px;">
+		<ui-select-match placeholder="Select a Product from Catalog">{{$select.selected.name}}</ui-select-match>
+			<ui-select-choices repeat="product in products | propsFilter: {name: $select.search, sellingPrice: $select.search}">
+			<div style="font-weight: bold;" ng-bind-html="product.name | highlight: $select.search"></div>
+			<small>     
+				Available Units: $<span ng-bind-html="''+product.availableUnits | highlight: $select.search"></span>
+				Selling Price: $<span ng-bind-html="''+product.sellingPrice | highlight: $select.search"></span>
+			</small>
+		</ui-select-choices>
+	</ui-select>
+	<!--Actions-->
+	<button class="btn btn-default btn-xs" id="btnClear" ng-disabled="btnClearDisable" ng-click="clear()">Clear Selection</button>
+	<button class="btn btn-default btn-xs" ng-click="addNew()">Add</button>
+	<!--Default Panel-->
+	<div class="productCatalog clear" ng-if="product.selected && !disabled">
+		<div class="plan">
+			<h3>{{product.selected.name}}<span>${{product.selected.unitCost}}</span></h3>
+			<a class="edit" href="" ng-click="disable()">Edit</a>		
+			<ul>
+				<li><b>Id</b> {{product.selected.id}}</li>
+				<li><b>Product Name</b> {{product.selected.name}}</li>
+				<li><b>Cost Per Unit $</b>{{product.selected.unitCost}}</li>
+				<li><b>Selling Price Per Unit $</b>{{product.selected.sellingPrice}}</li>
+				<li><b>No of Units Available </b> {{product.selected.availableUnits}}</li>
+			</ul>
+		</div> 	
+	</div>
+	<!--Edit Panel-->
+	<div class="productCatalog clear" ng-if="product.selected && disabled">
+		<div class="plan">
+			<h3>{{product.selected.name}}<span>${{product.selected.unitCost}}</span></h3>
+			<a class="edit" href="" ng-click="save()">Save</a>
+			<ul>
+				<li><b>Id</b> <span id="prodId">{{product.selected.id}}</span></li>
+				<li><b>Product Name</b> <span contenteditable="{{disabled}}" id="productName" ng-keypress="validateName($event)" class="editMode single-line">{{product.selected.name}}</span></li>
+				<li><b>Cost Per Unit $</b> <span id="unitCost" ng-keypress="validatePrice($event)">{{product.selected.unitCost}}</span></li>
+				<li><b>Selling Price Per Unit $</b> <span contenteditable="{{disabled}}" id="unitSellingPrice" ng-keypress="validatePrice($event)" class="editMode single-line">{{product.selected.sellingPrice}}</span></li>
+				<li><b>Available Units </b> <span>{{product.selected.availableUnits}}</span></li>
+			</ul>
+		</div>
+	</div>
+	<!--Add New Product Panel-->
+	<div class="productCatalog clear" ng-if="!product.selected && disabled && addProduct">
+		<div class="plan" style="width:300px;">
+			<h3>Product Details</h3>
+			<ul>
+				<li><b>Product Name</b> <span contenteditable="{{disabled}}" id="addProductName" ng-keypress="validateName($event)" style="min-width: 200px; display: inline-block;" class="editMode single-line">{{product.selected.name}}</span></li>
+				<li><b>Cost Per Unit $</b> <span contenteditable="{{disabled}}" id="addUnitCost" ng-keypress="validatePrice($event)" style="min-width: 100px; display: inline-block;" class="editMode single-line">{{product.selected.unitCost}}</span></li>
+				<li><b>Selling Price Per Unit $</b> <span contenteditable="{{disabled}}" id="addUnitSellingPrice" ng-keypress="validatePrice($event)" style="min-width: 50px; display: inline-block;" class="editMode single-line">{{product.selected.sellingPrice}}</span></li>
+				<li><b>Available Units </b> <span contenteditable="{{disabled}}" id="addAvailableUnits" ng-keypress="validatePrice($event)" style="min-width: 100px; display: inline-block;" class="editMode single-line">{{product.selected.availableUnits}}</span></li>
+			</ul>
+			<a class="edit" href="" ng-click="saveNewProduct()">Add</a>
+		</div>
+	</div>
+
+</body>
+</html>
